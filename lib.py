@@ -15,7 +15,7 @@ import AnaData
 不要乱改！不要乱改！不要乱改！
 不要删除！不要删除！不要删除！
 
-last update:2025.7.30 Nahidog(lsy)
+last update:2025.8.3 Nahidog(lsy)
 '''
 from Settings import * 
 import re
@@ -27,6 +27,7 @@ def get_on_Internet(url:str,user_agent:str=""):
         'User-Agent': user_agent
     }
     response = requests.get(url, headers=headers)
+    response.raise_for_status()
     response.encoding = response.apparent_encoding
     return [response.status_code,response.text]
 
@@ -35,7 +36,7 @@ def get_on_local(file_path:str):
     -1  file not found
     2  decode error
     114  path error
-    2  unknown error
+    1  unknown error
     '''
     
     if not os.path.exists(file_path):

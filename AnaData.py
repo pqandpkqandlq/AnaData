@@ -16,16 +16,10 @@
 不要乱动！不要乱动！不要乱动！
 不要删除！不要删除！不要删除！
 
-last update:2025.7.30 Nahidog(lsy)
+last update:2025.8.3 Nahidog(lsy)
 '''
 from AnaDataGUI import *
-class Window:
-    def __init__(self,title:str,resizable:list,geometry:str):
-        self.title=title
-        self.resizable=resizable
-        self.geometry=geometry
-    def WinMain(self):
-        pass      
+ 
 class HelpWindow(Window):
     def WinMain(self):
         self.win=tk.Toplevel()

@@ -3,14 +3,21 @@
 如果要新增UI的话
 请按照UI这个基类进行设计，最好直接继承它
 
-last update:2025.7.30 Nahidog(lsy)
+last update:2025.8.3 Nahidog(lsy)
 '''
 from lib import *
 import time
 import tkinter as tk
 import tkinter.filedialog as tkfd
+class Window:
+    def __init__(self,title:str,resizable:list,geometry:str):
+        self.title=title
+        self.resizable=resizable
+        self.geometry=geometry
+    def WinMain(self):
+        self.win=None     
 class UI(object):
-    def __init__(self, window):  # 参数名改为window
+    def __init__(self, window:Window):  # 参数名改为window
         self.window=window
         self.variables()
         self.elements(window)
@@ -33,7 +40,8 @@ class GetData_UI(UI):
         self.GetDataCondition_color=tk.StringVar()
         self.GetDataCondition_color.set("black")
         self.GetDataCondition_Add=""
-    def elements(self,window):
+    def elements(self,window:Window):
+
         self.label_GetWays=tk.Label(window.win,text="数据获取:",font=FONT)
         self.label_FilePath=tk.Label(window.win,text="文件路径:",font=FONT)
         self.entry_FilePath=tk.Entry(window.win)
@@ -133,14 +141,15 @@ class AnalyseData_UI(UI):
         self.AnalyseDataCondition.set("状态:")
         self.AnalyseDataCondition_color = tk.StringVar()
         self.AnalyseDataCondition_color.set("black")
-        self.text=""
-        self.global_data_frame=None
+        self.text=None
+        self.global_data_frame=DataFrame()
 
     def __init__(self, window):  # 参数名改为window
         super().__init__(window)
         self.get_data_ui = GetData_UI(window)
         
-    def elements(self, window):  # 参数名改为window
+    def elements(self, window:Window):  # 参数名改为window
+
         self.label_DataAnalyseCondition = tk.Label(window.win, font=FONT, textvariable=self.AnalyseDataCondition)  # 改为window.win
         self.label_DataAnalyse=tk.Label(window.win,font=FONT,text="数据分析:")
         # 正则表达式输入区域
@@ -165,24 +174,79 @@ class AnalyseData_UI(UI):
         self.label_DataAnalyse.place(x=LABEL_DATAANALYSE_POS[0],y=LABEL_DATAANALYSE_POS[1])
         
     def get_data(self):
+        self.text=None
         if self.get_data_ui.GetWays_selection.get()=="从本地获取":
             self.text=get_on_local(self.get_data_ui.entry_FilePath.get())
-            self.get_data_ui.GetDataCondition_color.set("green")
-            self.get_data_ui.GetDataCondition.set("状态:获取数据成功")
-            self.get_data_ui.label_GetDataCondition.config(fg=self.get_data_ui.GetDataCondition_color.get())
+            if self.text==-1:
+                self.get_data_ui.GetDataCondition_color.set("red")
+                self.get_data_ui.GetDataCondition.set("状态:未找到文件")
+                self.get_data_ui.label_GetDataCondition.config(fg=self.get_data_ui.GetDataCondition_color.get())
+            elif self.text==2:
+                self.get_data_ui.GetDataCondition_color.set("red")
+                self.get_data_ui.GetDataCondition.set("状态:解码错误")
+                self.get_data_ui.label_GetDataCondition.config(fg=self.get_data_ui.GetDataCondition_color.get())
+            elif self.text==114:
+                self.get_data_ui.GetDataCondition_color.set("red")
+                self.get_data_ui.GetDataCondition.set("状态:路径错误")
+                self.get_data_ui.label_GetDataCondition.config(fg=self.get_data_ui.GetDataCondition_color.get())
+            elif self.text==1:
+                self.get_data_ui.GetDataCondition_color.set("red")
+                self.get_data_ui.GetDataCondition.set("状态:未知错误")
+                self.get_data_ui.label_GetDataCondition.config(fg=self.get_data_ui.GetDataCondition_color.get())
+            else:
+                self.get_data_ui.GetDataCondition_color.set("green")
+                self.get_data_ui.GetDataCondition.set("状态:获取数据成功")
+                self.get_data_ui.label_GetDataCondition.config(fg=self.get_data_ui.GetDataCondition_color.get())
         elif self.get_data_ui.GetWays_selection.get()=="从网络获取":
-            response=get_on_Internet(self.get_data_ui.entry_GetURL.get(),self.get_data_ui.entry_UserAgent.get())
+            try:
+                response=get_on_Internet(self.get_data_ui.entry_GetURL.get(),self.get_data_ui.entry_UserAgent.get())
+            except requests.exceptions.MissingSchema:
+                self.get_data_ui.GetDataCondition.set("状态:缺失协议,请检查开头是否有https://或http://")
+                self.get_data_ui.GetDataCondition_color.set("red")
+                self.get_data_ui.label_GetDataCondition.config(foreground=self.get_data_ui.GetDataCondition_color.get())
+                return
+            except requests.exceptions.InvalidSchema:
+                self.get_data_ui.GetDataCondition.set("状态:无效协议,直接复制粘贴不好吗?")
+                self.get_data_ui.GetDataCondition_color.set("red")
+                self.get_data_ui.label_GetDataCondition.config(foreground=self.get_data_ui.GetDataCondition_color.get())
+                return
+            except requests.exceptions.InvalidURL:
+                self.get_data_ui.GetDataCondition.set("状态:无效URL,复制粘贴都不会,回家吧,回家吧好吧,你比较适合做1 tan √ 10")
+                self.get_data_ui.GetDataCondition_color.set("red")
+                self.get_data_ui.label_GetDataCondition.config(foreground=self.get_data_ui.GetDataCondition_color.get())
+                return
+            except requests.exceptions.ConnectionError:
+                self.get_data_ui.GetDataCondition.set("状态:无法与目标主机连接")
+                self.get_data_ui.GetDataCondition_color.set("red")
+                self.get_data_ui.label_GetDataCondition.config(foreground=self.get_data_ui.GetDataCondition_color.get())
+                return
+            except requests.exceptions.ConnectTimeout:
+                self.get_data_ui.GetDataCondition.set("状态:连接超时")
+                self.get_data_ui.GetDataCondition_color.set("red")
+                self.get_data_ui.label_GetDataCondition.config(foreground=self.get_data_ui.GetDataCondition_color.get())
+                return
+            except requests.exceptions.RequestException as e:
+                self.get_data_ui.GetDataCondition.set("状态:获取数据失败,异常码{}".format(e))
+                self.get_data_ui.GetDataCondition_color.set("red")
+                self.get_data_ui.label_GetDataCondition.config(foreground=self.get_data_ui.GetDataCondition_color.get())
+                return
+            except requests.exceptions.HTTPError:
+                self.get_data_ui.GetDataCondition.set("状态:HTTP状态码错误,状态码{}".format(response[0]))
+                self.get_data_ui.GetDataCondition_color.set("red")
+                self.get_data_ui.label_GetDataCondition.config(foreground=self.get_data_ui.GetDataCondition_color.get())
+                return
             if response[0]==200:
                 self.text=response[1]
                 if self.get_data_ui.SaveAsOtherPath.get()!="":
                     save_file(self.text,self.get_data_ui.SaveAsOtherPath.get())
-            else:
-                self.AnalyseDataCondition.set("状态:获取数据失败")
-                self.AnalyseDataCondition_color.set("red")
-                self.label_DataAnalyseCondition.config(foreground=self.AnalyseDataCondition_color.get())
+            # else:
+            #     self.AnalyseDataCondition.set("状态:获取数据失败,状态码{}".format(response[0]))
+            #     self.AnalyseDataCondition_color.set("red")
+            #     self.label_DataAnalyseCondition.config(foreground=self.AnalyseDataCondition_color.get())
                 
     def analyse(self):
         """执行数据分析的逻辑"""
+        self.global_data_frame=DataFrame()
         types = []
         for i in self.text_TypeZone.get("1.0", "end").split("\n"):
             if i != "":
@@ -200,7 +264,11 @@ class AnalyseData_UI(UI):
                     return
         
         try:
-            
+            if self.text is None or self.text=="" or self.text in [-1,2,114,1]:
+                self.AnalyseDataCondition.set("状态:源数据为空,本次分析跳过")
+                self.AnalyseDataCondition_color.set(YELLOW)
+                self.label_DataAnalyseCondition.config(foreground=self.AnalyseDataCondition_color.get())
+                return
             self.global_data_frame = analyse_data(types, self.text, REs)
         except Exception as e:
             self.AnalyseDataCondition.set("状态:分析数据时出错:{}".format(e))
@@ -253,6 +321,11 @@ class ExportData_UI(UI):
                 
             if file_path:
                 try:
+                    if self.analyse_data_ui.global_data_frame.empty:
+                        self.ExportDataCondition.set("状态:数据为空,跳过导出")
+                        self.ExportDataCondition_color.set(YELLOW)
+                        self.label_ExportCondition.config(foreground=self.ExportDataCondition_color.get())
+                        return
                     export_data_as_excel(self.analyse_data_ui.global_data_frame, file_path)
                 except PermissionError:
                     self.ExportDataCondition.set("状态:权限错误,请检查文件是否被占用")
@@ -288,6 +361,11 @@ class ExportData_UI(UI):
                 
             if file_path:
                 try:
+                    if self.analyse_data_ui.global_data_frame.empty:
+                        self.ExportDataCondition.set("状态:数据为空,跳过导出")
+                        self.ExportDataCondition_color.set(YELLOW)
+                        self.label_ExportCondition.config(foreground=self.ExportDataCondition_color.get())
+                        return
                     export_data_as_txt(self.analyse_data_ui.global_data_frame, file_path)
                 except PermissionError:
                     self.ExportDataCondition.set("状态:权限错误,请检查文件是否被占用")

@@ -20,11 +20,11 @@ AnaData.py调用会炸
 别像lsy这个大sb一样不写注释！
 别像lsy这个大sb一样不写注释！
 
-last update:2025.7.30 Nahidog(lsy)
+last update:2025.8.3 Nahidog(lsy)
 '''
 #PRODUCT INFORMATION
 TITLE="AnaData"
-VERSION="T1.2"    #R:release,T:test
+VERSION="R1.2"    #R:release,T:test
 #SYSTEM
 GEOMETRY="500x600"
 ENCODINGS=("utf-8","gbk","gb2312","iso-8859-1")

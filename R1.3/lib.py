@@ -21,7 +21,7 @@ from Settings import *
 import re
 import requests
 import os
-from pandas import DataFrame
+import pandas as pd
 import webbrowser as wb
 def get_on_Internet(url:str,user_agent:str=""):
     headers = {
@@ -74,14 +74,19 @@ def analyse_data(types:list,text,REs:list):
     
     # 生成字典
     result_dict = {t: d for t, d in zip(types, analysed_data)}
-    return DataFrame(result_dict)
+    return pd.DataFrame(result_dict)
+
 
 def save_file(text:str,path:str):
+    # dir=re.findall('.*/([^/]*)$',path)[0]
+
+    # os.makedirs(dir,exist_ok=True)
+
     with open(path,'w',encoding='utf-8') as file:
         file.write(text)
-def export_data_as_excel(data_frame:DataFrame, file_path:str):
+def export_data_as_excel(data_frame:pd.DataFrame, file_path:str):
     data_frame.to_excel(file_path, index=False)
-def export_data_as_txt(data_frame:DataFrame, file_path:str):
+def export_data_as_txt(data_frame:pd.DataFrame, file_path:str):
     data_frame.to_csv(file_path, index=False, sep='\t')
 
 def open_url(url:str):

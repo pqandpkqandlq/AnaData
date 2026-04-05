@@ -20,6 +20,6 @@
 from win_class import *
 
 if __name__=="__main__":
-    AnaData=MainWindow(TITLE+VERSION,(False,False),GEOMETRY)
+    AnaData=MainWindow(TITLE+' '+VERSION,(False,False),GEOMETRY)
 
     AnaData.WinMain()

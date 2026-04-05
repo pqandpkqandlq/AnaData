@@ -91,7 +91,7 @@ class GetData_UI(UI):
         def SetTEMP():
             """设置临时文件路径"""
             self.entry_SaveAsOtherPath.delete(0,tk.END)
-            self.entry_SaveAsOtherPath.insert(0,"C:/Users/ADMINI~1/AppData/Local/Temp/AnaData/{}.txt".format(time.time()))
+            self.entry_SaveAsOtherPath.insert(0,"C:/Users/ADMINI~1/AppData/Local/Temp/AnaData{}.txt".format(time.time()))
 
 
         self.button_TEMP=tk.Button(window.win,text="设为临时文件",command=SetTEMP)
@@ -144,7 +144,7 @@ class AnalyseData_UI(UI):
         self.AnalyseDataCondition_color = tk.StringVar()
         self.AnalyseDataCondition_color.set("black")
         self.text=None
-        self.global_data_frame=DataFrame()
+        self.global_data_frame=pd.DataFrame()   
 
     def __init__(self, window):  # 参数名改为window
         super().__init__(window)
@@ -279,7 +279,7 @@ class AnalyseData_UI(UI):
                 
     def analyse(self):
         """执行数据分析的逻辑"""
-        self.global_data_frame=DataFrame()
+        self.global_data_frame=pd.DataFrame() 
         types = []
         for i in self.text_TypeZone.get("1.0", "end").split("\n"):
             if i != "":
